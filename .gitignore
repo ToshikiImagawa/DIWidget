@@ -44,3 +44,6 @@ Assets/Plugins/Editor.meta
 # Zenject
 Packages/Zenject/**/*
 Packages/Zenject.meta
+
+Assets/Plugins/Zenject/**/*
+Assets/Plugins/Zenject.meta

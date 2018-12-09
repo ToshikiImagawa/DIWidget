@@ -11,7 +11,7 @@ namespace DIWidget.Sample
             [Inject(Id = "Window2")] Window.Pool pool2,
             [Inject(Id = "Window3")] Window.Pool pool3,
             [Inject(Id = "Window4")] Window.Pool pool4,
-            [Inject(Id = "WindowViewPoint")] Transform viewPoint)
+            Transform viewPoint)
         {
             SetPool("Window1", pool1);
             SetPool("Window2", pool2);

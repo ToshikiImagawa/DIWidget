@@ -1,16 +1,14 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace DIWidget
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public class Window : Widget<Window>
+    public class Dialog : Widget<Dialog>
     {
         [SerializeField] private string identify;
-
-        private CanvasGroup _canvasGroup;
-
         public override object Identify => identify;
 
+        private CanvasGroup _canvasGroup;
         protected CanvasGroup CanvasGroup =>
             _canvasGroup != null ? _canvasGroup : _canvasGroup = GetComponent<CanvasGroup>();
 

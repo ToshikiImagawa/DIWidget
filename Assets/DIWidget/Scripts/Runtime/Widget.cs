@@ -77,6 +77,14 @@ namespace DIWidget
         protected abstract void OnClose();
 
         /// <summary>
+        /// Updates the widget.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        protected virtual void OnUpdateWidget(params object[] parameters)
+        {
+        }
+
+        /// <summary>
         /// FadeIn時に実行する
         /// ※FadeIn終了時に必ずfadeInEndActionを実行する.
         /// </summary>
@@ -94,6 +102,11 @@ namespace DIWidget
         protected virtual void OnFadeOut(Action fadeOutEndAction)
         {
             fadeOutEndAction();
+        }
+
+        internal void UpdateWidget(params object[] parameters)
+        {
+            OnUpdateWidget(parameters);
         }
 
         public class Pool : MemoryPool<TWidget>
