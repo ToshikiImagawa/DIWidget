@@ -47,3 +47,10 @@ Packages/Zenject.meta
 
 Assets/Plugins/Zenject/**/*
 Assets/Plugins/Zenject.meta
+
+# ContainClip
+
+Assets/Plugins/ContainClip/**/*
+Assets/Plugins/ContainClip.meta
+Packages/ContainClip/**/*
+Packages/ContainClip.meta
