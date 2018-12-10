@@ -3,27 +3,105 @@ using Zenject;
 
 namespace DIWidget
 {
-    public abstract class WidgetManager<TWidget> : IWidgetManager where TWidget : Widget<TWidget>
+    public class WidgetManager<TWidget> : IWidgetManager where TWidget : Widget<TWidget>
     {
-        private TWidget _openWidget;
-        private readonly ListStack<TWidget> _closedListStack = new ListStack<TWidget>();
-        private readonly object _closedListLock = new object();
-
         [Inject]
         protected WidgetSet<TWidget> WidgetSet { get; private set; }
 
-        protected TWidget OpenWidget
+        protected TWidget Current { get; private set; }
+
+        /// <summary>
+        /// Open
+        /// </summary>
+        /// <param name="identify"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public TWidget Open(object identify, params object[] parameters)
         {
-            get
-            {
-                lock (_closedListLock)
-                {
-                    return _openWidget;
-                }
-            }
+            OnBeforeOpen();
+            var widget = GetPool(identify).Spawn();
+            widget.transform.SetParent(WidgetSet.ViewPoint, false);
+            if (parameters != null) widget.UpdateWidget(parameters);
+            Current = SetCurrentWidgetOnOpen(widget);
+            OnAfterOpen();
+            return Current;
         }
 
-        protected ListStack<TWidget> ClosedListStack => _closedListStack;
+        /// <summary>
+        /// Remove
+        /// </summary>
+        /// <param name="widget"></param>
+        /// <returns></returns>
+        public TWidget Remove(TWidget widget)
+        {
+            if (widget == null) throw new NullReferenceException($"Instance of widget to remove is null. : {nameof(TWidget)}");
+            OnBeforeRemove();
+            Current = SetCurrentWidgetOnRemove(widget);
+            OnAfterRemove();
+            return Current;
+        }
+
+        /// <summary>
+        /// Remove current widget
+        /// </summary>
+        /// <returns></returns>
+        public TWidget Remove()
+        {
+            return Current != null ? Remove(Current) : null;
+        }
+
+        protected virtual TWidget SetCurrentWidgetOnOpen(TWidget openWidget)
+        {
+            if (Current != null)
+            {
+                Finalize(Current);
+                Despawn(Current);
+            }
+
+            Initialize(openWidget);
+            return openWidget;
+        }
+
+        protected virtual TWidget SetCurrentWidgetOnRemove(TWidget removeWidget)
+        {
+            if (Current != removeWidget) return Current;
+            Finalize(Current);
+            Despawn(Current);
+            return null;
+        }
+
+        protected virtual void OnBeforeOpen()
+        {
+        }
+
+        protected virtual void OnAfterOpen()
+        {
+        }
+
+        protected virtual void OnBeforeRemove()
+        {
+        }
+
+        protected virtual void OnAfterRemove()
+        {
+        }
+
+        protected void Despawn(TWidget widget)
+        {
+            GetPool(widget).Despawn(widget);
+        }
+
+        protected void Initialize(TWidget widget)
+        {
+            widget.Open();
+            widget.SetManager(this);
+        }
+
+        protected static void Finalize(TWidget widget)
+        {
+            widget.Close();
+            widget.SetManager(null);
+        }
 
         private Widget<TWidget>.Pool GetPool(object identify)
         {
@@ -34,75 +112,11 @@ namespace DIWidget
         {
             return WidgetSet.GetPool(widget.Identify);
         }
-
-        public TWidget Open(object identify, params object[] parameters)
-        {
-            lock (_closedListLock)
-            {
-                if (_openWidget != null)
-                {
-                    _closedListStack.Push(_openWidget);
-                    Finalize(_openWidget);
-                    _openWidget = null;
-                }
-            }
-            var widget = GetPool(identify).Spawn();
-            widget.transform.SetParent(WidgetSet.ViewPoint, false);
-            Initialize(widget);
-
-            if (parameters != null) widget.UpdateWidget(parameters);
-
-            lock (_closedListLock)
-            {
-                _openWidget = widget;
-                OnOpen();
-            }
-            return widget;
-        }
-
-        public void Remove(TWidget widget)
-        {
-            lock (_closedListLock)
-            {
-                if (_openWidget == widget)
-                {
-                    Finalize(_openWidget);
-                    _openWidget = null;
-
-                    if (_closedListStack.Length > 0)
-                    {
-                        _openWidget = _closedListStack.Pop();
-                        Initialize(_openWidget);
-                    }
-                }
-                else
-                {
-                    _closedListStack.Remove(widget);
-                }
-                OnRemove();
-            }
-            GetPool(widget).Despawn(widget);
-        }
-
-        protected virtual void OnOpen() { }
-        protected virtual void OnRemove() { }
-
-        private static void Initialize(IWidget widget)
-        {
-            widget.Open();
-        }
-
-        private static void Finalize(IWidget widget)
-        {
-            widget.Close();
-        }
     }
 
-    internal interface IWidget : IDisposable
+    public interface IWidget : IDisposable
     {
         object Identify { get; }
-        void Open();
-        void Close();
     }
 
     public interface IWidgetManager

@@ -1,15 +1,17 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 
 namespace DIWidget
 {
-    public abstract class Widget<TWidget> : UIBehaviour, IWidget where TWidget : Widget<TWidget>
+    public abstract class Widget<TWidget> : WidgetBase where TWidget : Widget<TWidget>
     {
         private EStep Step { get; set; } = EStep.None;
-        private event Action<TWidget> CallBackWidgetEnd;
 
-        public virtual void Dispose()
+        public WidgetManager<TWidget> Manager { get; private set; }
+
+        public override void Dispose()
         {
         }
 
@@ -19,51 +21,78 @@ namespace DIWidget
             set => gameObject.SetActive(value);
         }
 
-        public abstract object Identify { get; }
-
         /// <summary>
         /// 開く
         /// ※Managerからのみ実行
         /// </summary>
-        void IWidget.Open()
+        internal void Open()
         {
-            if (Display && Step != EStep.None) return;
-            Display = true;
-            Step = EStep.FadeIn;
-            OnFadeIn(() =>
+            if (Step != EStep.None && Step != EStep.FadeOut) return;
+            if (Step == EStep.FadeOut)
             {
-                OnOpen();
+                OnClose();
+                Display = false;
+                Step = EStep.None;
+            }
+
+            if (!Display)
+            {
+                Display = true;
+                Step = EStep.FadeIn;
+                OnFadeIn(() =>
+                {
+                    if (Step != EStep.FadeIn) return;
+                    OnOpen();
+                    Step = EStep.Idle;
+                });
+            }
+            else
+            {
                 Step = EStep.Idle;
-            });
+            }
         }
 
         /// <summary>
         /// 閉じる
         /// ※Managerからのみ実行
         /// </summary>
-        void IWidget.Close()
+        internal void Close()
         {
             if (Step != EStep.Idle && Step != EStep.FadeIn) return;
+            if (Step == EStep.FadeIn)
+            {
+                OnOpen();
+                Step = EStep.Idle;
+            }
+
             if (Display)
             {
                 Step = EStep.FadeOut;
                 OnFadeOut(() =>
                 {
+                    if (Step != EStep.FadeOut) return;
                     // 閉じる処理
                     OnClose();
 
                     // アクティブ状態の設定
                     Display = false;
                     Step = EStep.None;
-
-                    // 終了コールバック
-                    CallBackWidgetEnd?.Invoke(this as TWidget);
                 });
             }
             else
             {
                 Step = EStep.None;
             }
+        }
+
+        /// <summary>
+        /// Managerを設定する
+        /// </summary>
+        /// <param name="widgetManager"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        internal void SetManager(IWidgetManager widgetManager)
+        {
+            Manager = widgetManager as WidgetManager<TWidget>;
         }
 
         /// <summary>

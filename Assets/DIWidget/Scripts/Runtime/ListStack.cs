@@ -9,7 +9,7 @@ namespace DIWidget
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <inheritdoc />
-    public class ListStack<T> : IEnumerable
+    public class ListStack<T> : IEnumerable<T>
     {
         private List<T> _list = new List<T>();
 
@@ -21,19 +21,19 @@ namespace DIWidget
 
         public T Pop()
         {
-            var elm = Peek;
-            Remove(elm);
-            return elm;
+            var item = Peek;
+            Remove(item);
+            return item;
         }
 
-        public void Push(T elm)
+        public void Push(T item)
         {
-            _list.Add(elm);
+            _list.Add(item);
         }
 
-        public void Remove(T elm)
+        public void Remove(T item)
         {
-            if (elm != null) _list.Remove(elm);
+            if (item != null) _list.Remove(item);
         }
 
         public List<T> Clear()
@@ -43,12 +43,17 @@ namespace DIWidget
             return tmp;
         }
 
-        public bool IsExist(T elm)
+        public bool IsExist(T item)
         {
-            return _list.Count > 0 && _list.Contains(elm);
+            return _list.Count > 0 && _list.Contains(item);
         }
 
-        public IEnumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _list.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return _list.GetEnumerator();
         }
