@@ -3,7 +3,7 @@ using Zenject;
 
 namespace DIWidget
 {
-    public class WidgetManager<TWidget> : IWidgetManager where TWidget : Widget<TWidget>
+    public class WidgetManager<TWidget> : IWidgetManager<TWidget> where TWidget : Widget<TWidget>
     {
         [Inject]
         protected WidgetSet<TWidget> WidgetSet { get; private set; }
@@ -34,7 +34,8 @@ namespace DIWidget
         /// <returns></returns>
         public TWidget Remove(TWidget widget)
         {
-            if (widget == null) throw new NullReferenceException($"Instance of widget to remove is null. : {nameof(TWidget)}");
+            if (widget == null)
+                throw new NullReferenceException($"Instance of widget to remove is null. : {nameof(TWidget)}");
             OnBeforeRemove();
             Current = SetCurrentWidgetOnRemove(widget);
             OnAfterRemove();
@@ -48,6 +49,25 @@ namespace DIWidget
         public TWidget Remove()
         {
             return Current != null ? Remove(Current) : null;
+        }
+
+        IWidget IWidgetManager.Open(object identify, params object[] parameters)
+        {
+            return Open(identify, parameters);
+        }
+
+        IWidget IWidgetManager.Remove(IWidget widget)
+        {
+            var item = widget as TWidget;
+            if (item == null)
+                throw new Exception(
+                    $"instance of widget to remove is type of different. {widget.GetType()}\n{typeof(TWidget)}");
+            return Remove(item);
+        }
+
+        IWidget IWidgetManager.Remove()
+        {
+            return Remove();
         }
 
         protected virtual TWidget SetCurrentWidgetOnOpen(TWidget openWidget)
@@ -114,12 +134,17 @@ namespace DIWidget
         }
     }
 
-    public interface IWidget : IDisposable
-    {
-        object Identify { get; }
-    }
-
     public interface IWidgetManager
     {
+        IWidget Open(object identify, params object[] parameters);
+        IWidget Remove(IWidget widget);
+        IWidget Remove();
+    }
+
+    public interface IWidgetManager<TWidget> : IWidgetManager where TWidget : IWidget<TWidget>
+    {
+        new TWidget Open(object identify, params object[] parameters);
+        TWidget Remove(TWidget widget);
+        new TWidget Remove();
     }
 }
