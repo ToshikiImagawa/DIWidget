@@ -12,11 +12,25 @@ namespace DIWidget
             return self.Bind<WidgetSet<TWidget>>().To<TWidgetSet>();
         }
 
+        public static FromBinderGeneric<TWidgetSet> BindWidgetSetWithId<TWidget, TWidgetSet>(this DiContainer self,
+            object identifier)
+            where TWidgetSet : WidgetSet<TWidget> where TWidget : Widget<TWidget>
+        {
+            return self.Bind<WidgetSet<TWidget>>().WithId(identifier).To<TWidgetSet>();
+        }
+
         public static ConcreteIdArgConditionCopyNonLazyBinder BindWidgetSetSingle<TWidget, TWidgetSet>(
             this DiContainer self)
             where TWidgetSet : WidgetSet<TWidget> where TWidget : Widget<TWidget>
         {
             return self.BindWidgetSet<TWidget, TWidgetSet>().AsSingle();
+        }
+
+        public static ConcreteIdArgConditionCopyNonLazyBinder BindWidgetSetWithIdSingle<TWidget, TWidgetSet>(
+            this DiContainer self, object identifier)
+            where TWidgetSet : WidgetSet<TWidget> where TWidget : Widget<TWidget>
+        {
+            return self.BindWidgetSetWithId<TWidget, TWidgetSet>(identifier).AsSingle();
         }
 
         public static NameTransformScopeConcreteIdArgConditionCopyNonLazyBinder
