@@ -25,8 +25,16 @@ namespace DIWidget
         internal void SetManager(IWidgetManager widgetManager)
         {
             var manager = widgetManager as WidgetManager<TWidget>;
-            Manager = manager ?? throw new NullReferenceException(
+            Manager = manager ?? throw new Exception(
                           $"type of WidgetManager does not match. {typeof(TWidget)}\n{widgetManager?.GetType()}");
+        }
+
+        /// <summary>
+        /// Reset manager
+        /// </summary>
+        internal void ResetManager()
+        {
+            Manager = null;
         }
 
         /// <summary>

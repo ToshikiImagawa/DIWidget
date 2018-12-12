@@ -120,7 +120,7 @@ namespace DIWidget
         protected static void Finalize(TWidget widget)
         {
             widget.Close();
-            widget.SetManager(null);
+            widget.ResetManager();
         }
 
         private Widget<TWidget>.Pool GetPool(object identify)
