@@ -24,7 +24,9 @@ namespace DIWidget
         /// <exception cref="NotImplementedException"></exception>
         internal void SetManager(IWidgetManager widgetManager)
         {
-            Manager = widgetManager as WidgetManager<TWidget>;
+            var manager = widgetManager as WidgetManager<TWidget>;
+            Manager = manager ?? throw new NullReferenceException(
+                          $"type of WidgetManager does not match. {typeof(TWidget)}\n{widgetManager?.GetType()}");
         }
 
         /// <summary>
