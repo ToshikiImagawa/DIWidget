@@ -3,7 +3,7 @@ using Zenject;
 
 namespace DIWidget.Sample
 {
-    public class BlindWindowButton: MonoBehaviour
+    public class BlindWindowButton : MonoBehaviour
     {
         [SerializeField] private string identify;
 

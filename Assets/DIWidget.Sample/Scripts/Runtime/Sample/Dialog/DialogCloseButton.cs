@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DIWidget.Sample
 {
@@ -6,10 +8,22 @@ namespace DIWidget.Sample
     {
         [SerializeField] private Dialog _dialog;
 
-        [ContextMenu("Remove")]
-        public void Remove()
+        private void Awake()
         {
-            _dialog.Manager.Remove(_dialog);
+            GetComponent<Button>().onClick.AddListener(Remove);
+        }
+
+        [ContextMenu("Remove")]
+        private void Remove()
+        {
+            try
+            {
+                _dialog.Manager.Remove(_dialog);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
     }
 }

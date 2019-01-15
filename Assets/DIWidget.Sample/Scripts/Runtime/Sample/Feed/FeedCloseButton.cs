@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace DIWidget.Sample
 {
@@ -6,10 +8,22 @@ namespace DIWidget.Sample
     {
         [SerializeField] private Feed _feed;
 
-        [ContextMenu("Remove")]
-        public void Remove()
+        private void Awake()
         {
-            _feed.Manager.Remove(_feed);
+            GetComponent<Button>().onClick.AddListener(Remove);
+        }
+
+        [ContextMenu("Remove")]
+        private void Remove()
+        {
+            try
+            {
+                _feed.Manager.Remove(_feed);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
     }
 }
