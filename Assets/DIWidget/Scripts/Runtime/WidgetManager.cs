@@ -123,12 +123,12 @@ namespace DIWidget
             widget.ResetManager();
         }
 
-        private Widget<TWidget>.Pool GetPool(object identify)
+        private IMemoryPool<TWidget> GetPool(object identify)
         {
             return WidgetSet.GetPool(identify);
         }
 
-        private Widget<TWidget>.Pool GetPool(IWidget widget)
+        private IMemoryPool<TWidget> GetPool(IWidget widget)
         {
             return WidgetSet.GetPool(widget.Identify);
         }

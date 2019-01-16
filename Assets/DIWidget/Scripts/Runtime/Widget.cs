@@ -1,7 +1,4 @@
 ﻿using System;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using Zenject;
 
 namespace DIWidget
 {
@@ -49,10 +46,6 @@ namespace DIWidget
         internal void UpdateWidget(params object[] parameters)
         {
             OnUpdateWidget(parameters);
-        }
-
-        public class Pool : MemoryPool<TWidget>
-        {
         }
     }
 

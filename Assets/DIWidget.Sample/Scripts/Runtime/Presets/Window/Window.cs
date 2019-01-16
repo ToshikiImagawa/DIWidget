@@ -1,4 +1,5 @@
 using UnityEngine;
+using Zenject;
 
 namespace DIWidget
 {
@@ -26,6 +27,10 @@ namespace DIWidget
             CanvasGroup.alpha = 0;
             CanvasGroup.interactable = false;
             CanvasGroup.blocksRaycasts = false;
+        }
+
+        public class Pool : MemoryPool<Window>
+        {
         }
     }
 }
